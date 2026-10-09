@@ -12,7 +12,7 @@ linked=[]
 
 embedded=["FBLPromises.xcframework", "FirebaseAnalytics.xcframework", "FirebaseCore.xcframework", "FirebaseCoreInternal.xcframework", "FirebaseInstallations.xcframework", "GoogleAdsOnDeviceConversion.xcframework", "GoogleAppMeasurement.xcframework", "GoogleAppMeasurementIdentitySupport.xcframework", "GoogleUtilities.xcframework", "nanopb.xcframework"]
 
-system=["UserNotifications.framework", "UIKit.framework", "Foundation.framework"]
+system=["UserNotifications.framework", "UIKit.framework", "Foundation.framework", "AppTrackingTransparency.framework"]
 
 capabilities=[]
 

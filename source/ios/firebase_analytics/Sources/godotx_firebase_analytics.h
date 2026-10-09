@@ -19,6 +19,14 @@ public:
     void log_event(String event_name, Dictionary params);
     void set_consent(Dictionary consent);
     void set_analytics_collection_enabled(bool enabled);
+    void set_user_id(String user_id);
+    void set_user_property(String name, String value);
+    void set_default_event_parameters(Dictionary params);
+    void reset_analytics_data();
+    void request_app_instance_id();
+    String get_tcf_value(String key);
+    void request_tracking_authorization();
+    int get_tracking_status();
 
     GodotxFirebaseAnalytics();
     ~GodotxFirebaseAnalytics();

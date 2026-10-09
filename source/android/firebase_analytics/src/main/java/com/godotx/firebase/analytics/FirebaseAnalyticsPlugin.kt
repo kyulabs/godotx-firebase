@@ -39,6 +39,10 @@ class FirebaseAnalyticsPlugin(godot: Godot) : GodotPlugin(godot) {
             SignalInfo(
                 "analytics_error",
                 String::class.java
+            ),
+            SignalInfo(
+                "analytics_app_instance_id",
+                String::class.java
             )
         )
     }
@@ -140,5 +144,60 @@ class FirebaseAnalyticsPlugin(godot: Godot) : GodotPlugin(godot) {
         }
         FirebaseAnalytics.getInstance(ctx).setAnalyticsCollectionEnabled(enabled)
     }
-}
 
+    // kyulabs: user id · user properties · default params · reset · app instance id (2026-10-09)
+    @UsedByGodot
+    fun set_user_id(user_id: String) {
+        val ctx = activity ?: run { emitSignal("analytics_error", "activity_null"); return }
+        FirebaseAnalytics.getInstance(ctx).setUserId(if (user_id.isEmpty()) null else user_id)
+    }
+
+    @UsedByGodot
+    fun set_user_property(name: String, value: String) {
+        val ctx = activity ?: run { emitSignal("analytics_error", "activity_null"); return }
+        FirebaseAnalytics.getInstance(ctx).setUserProperty(name, if (value.isEmpty()) null else value)
+    }
+
+    @UsedByGodot
+    fun set_default_event_parameters(params: Dictionary) {
+        val ctx = activity ?: run { emitSignal("analytics_error", "activity_null"); return }
+        val bundle = Bundle()
+        for (key in params.keys) {
+            val value = params[key]
+            if (key !is String || value == null) continue
+            when (value) {
+                is Int -> bundle.putInt(key, value)
+                is Long -> bundle.putLong(key, value)
+                is Float -> bundle.putDouble(key, value.toDouble())
+                is Double -> bundle.putDouble(key, value)
+                is Boolean -> bundle.putInt(key, if (value) 1 else 0)
+                is String -> bundle.putString(key, value)
+                else -> {}
+            }
+        }
+        FirebaseAnalytics.getInstance(ctx).setDefaultEventParameters(bundle)
+    }
+
+    @UsedByGodot
+    fun reset_analytics_data() {
+        val ctx = activity ?: run { emitSignal("analytics_error", "activity_null"); return }
+        FirebaseAnalytics.getInstance(ctx).resetAnalyticsData()
+    }
+
+    @UsedByGodot
+    fun request_app_instance_id() {
+        val ctx = activity ?: run { emitSignal("analytics_error", "activity_null"); return }
+        FirebaseAnalytics.getInstance(ctx).appInstanceId
+            .addOnSuccessListener { id -> emitSignal("analytics_app_instance_id", id ?: "") }
+            .addOnFailureListener { emitSignal("analytics_app_instance_id", "") }
+    }
+
+    // kyulabs: IAB TCF values written by the CMP (UMP) into the default SharedPreferences, as a string ("" if unset).
+    @UsedByGodot
+    fun get_tcf_value(key: String): String {
+        val ctx = activity ?: return ""
+        val prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
+        val value = prefs.all[key] ?: return ""
+        return value.toString()
+    }
+}
